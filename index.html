@@ -4,60 +4,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <title>Todo App</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css">
+    <title>Weather App</title>
+    <style>
+
+.error {
+    width: 100%;
+    text-align: left;
+    font-size: 0.8rem;
+    color: #ff6b6b;
+    padding-left: 3rem;
+    min-height: 1rem;
+    opacity: 1;
+    transform: translateY(-4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+
+    </style>
 </head>
 
-<style>
-  
-    
-</style>
-
 <body>
-    <header>
-        <nav>
-            <i class="fa-solid fa-bars  bars"></i>
-            <h1>Todo's</h1>
-          <ul class="hidden">
-    <i class="fa-solid fa-x bars"></i>
-    <li class="nav-total">Total Tasks <span></span></li>
-    <li class="nav-completed">Task Completed <span></span></li>
-    <li class="nav-pending">Pending Task <span></span></li>
-</ul>
-        </nav>
-    </header>
 
-    <section>
-        <div class="addition_bar">
-            <input type="text" placeholder="Enter Task" id="">
-            <button class="btn addbtn">ADD</button>
+    <div class="container">
+
+        <div class="child">
+            <i id="toogle-btn" class="fa-regular fa-moon fa-lg"></i>
+            <header>
+                <input type="search" placeholder="Search City" id="searchBar">
+                <p class="error"></p>
+            </header>
+
+            <section>
+                <div class="iconDiv">
+                    <img src="" alt="image representing weather">
+                </div>
+
+                <div class="info">
+                    <h2>21 C</h2>
+                    <p>Lahore - partily cloudly</p>
+                    <p class="date">Monday May 26, 2026</p>
+                    <div class="icons">
+                        <p>💧 <span id="humidity"></span>%</p>
+                        <p>💨 <span id="wind"></span> km/h</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="UpcomingDays">
+                <div class="daysCard">
+                    <h3>Mon</h3>
+                    <img src="" alt="weather image">
+                    <h2>22 C</h2>
+                </div>
+            </section>
+            <footer>
+                <span class="footer-label">Recent</span>
+                <div id="lastSearchedList">
+                    <h1 id="lastSearched">Lahore</h1>
+                </div>
+              
+            </footer>
         </div>
-    </section>
-    
+    </div>
 
-    <section class="editsection">
-        <ul class="task-container">
-          
-            
-        </ul>
-    </section>
-
-
-    <section>
-      <div class="stats">
-    <h2 class="total btn stat-total">Total : <span>0</span></h2>
-    <h2 class="pending btn stat-pending">Pending : <span>0</span></h2>
-    <h2 class="completed btn stat-completed">Completed : <span>0</span></h2>
-</div>
-    </section>
-
-    <footer>
-        <p>&copy; 2026 Todo's App. All rights reserved.</p>
-    </footer>
-
-
-    <script src="script.js"></script>
+<script type="module" src="./js/main.js"></script>
 </body>
 
 </html>
