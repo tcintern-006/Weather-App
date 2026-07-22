@@ -23,14 +23,15 @@ No frameworks or build tools are used. This project intentionally sticks to vani
 ## Project Structure
 
 ```
-weather-app/
+Weather-App/
 ├── index.html
 ├── style.css
-├── main.js           # entry point: DOM references, event listeners, render orchestration
-├── api.js            # fetch logic, error handling, API communication
-├── render.js          # forecast card rendering (pure rendering function)
-├── recentSearch.js     # last-searched city tracking + shared date utility
-├── toogle.js          # dark/light mode toggle logic
+├── js/
+│   ├── main.js          # entry point: DOM references, event listeners, render orchestration
+│   ├── api.js           # fetch logic, error handling, API communication
+│   ├── render.js         # forecast card rendering (pure rendering function)
+│   ├── recentSearch.js    # last-searched city tracking + shared date utility
+│   └── toogle.js         # dark/light mode toggle logic
 └── README.md
 ```
 
@@ -76,7 +77,10 @@ All request logic is wrapped in `try...catch` to surface errors to the user thro
 The project uses native browser `import` / `export` syntax rather than a bundler. Each file explicitly declares what it exposes (`export`) and what it depends on (`import`), making dependencies between files explicit and traceable.
 
 ```js
+// js/api.js
 export async function getApi(...) { ... }
+
+// js/main.js
 import { getApi } from "./api.js";
 ```
 
@@ -109,9 +113,14 @@ JSON.parse(localStorage.getItem("lastSearched")) ?? [];
    cd weather-app
    ```
 
-2. Add your API key in `api.js`
+2. Add your API key in `js/api.js`
    ```js
    const apiKey = "YOUR_API_KEY_HERE";
+   ```
+
+   Make sure `index.html` loads the entry point from the `js/` folder:
+   ```html
+   <script type="module" src="js/main.js"></script>
    ```
 
 3. Serve the project locally (e.g. VS Code "Live Server" extension, or):
