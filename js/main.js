@@ -1,12 +1,19 @@
 import { getApi } from "./api.js";
+import { clearAll } from "./deletehistory.js";
 import { getdayName } from "./recentSearch.js";
-import { getRender } from "./render.js";
+import { getRender, getrenderRecent } from "./render.js";
 import { gettoogle } from "./toogle.js";
 
 const apiKey = "527dd915fabe40979c2141828262107";
 const input = document.querySelector("header input");
-let city = "Naushera";
-let lastSearched = JSON.parse(localStorage.getItem("lastSearched")) ?? [];
+let getitems = JSON.parse(localStorage.getItem("lastSearched")) ?? [];
+let lastSearched =  Array.isArray(getitems) ? getitems : [];
+
+
+let city = getitems[getitems.length -1] ?? "Naushera"
+getApi(apiKey, city , lastSearched)
+
+
 
 
 
@@ -23,8 +30,7 @@ input.addEventListener('keydown', async (e) => {
 
 
 // GET LAST SEARCHED
-async function get(params) {
-
+async function get() {
     lastSearched = await getApi(apiKey, city, lastSearched);
 }
 get()
@@ -67,4 +73,21 @@ export const render = (data) => {
 let toogleBtn = document.querySelector("#toogle-btn");
 toogleBtn.addEventListener("click", () => {
     gettoogle()
+})
+
+
+
+
+let h1 = document.querySelector("#lastSearched");
+
+
+h1.addEventListener("click",(e)=>{
+    let value = e.target.textContent;
+    getApi(apiKey, value , lastSearched)
+})
+
+let clear = document.querySelector(".textee");
+
+clear.addEventListener("click", ()=>{
+clearAll();
 })

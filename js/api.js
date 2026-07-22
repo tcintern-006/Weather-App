@@ -1,9 +1,10 @@
 import { render } from "./main.js";
-import { getRecentSearched } from "./recentSearch.js";
+import { getLastFive, getRecentSearched } from "./recentSearch.js";
 
 
-export async function getApi(apiKey, city, lastSearched) {
-    console.log(city)
+export async function getApi(apiKey, city) {
+    let getitems = JSON.parse(localStorage.getItem("lastSearched")) ?? [];
+    let lastSearched = Array.isArray(getitems) ? getitems : [];
     let err = document.querySelector(".error")
     let section = document.querySelector("section");
     let cards = document.querySelector("#UpcomingDays");
@@ -20,17 +21,17 @@ export async function getApi(apiKey, city, lastSearched) {
         let data = await response.json();
         lastSearched = [...lastSearched, data.location.name];
         localStorage.setItem("lastSearched", JSON.stringify(lastSearched))
+        getLastFive();
         getRecentSearched(lastSearched);
         render(data);
-        return lastSearched;
     } catch (error) {
         console.log(error.message)
         err.textContent = error.message;
 
 
-    }finally {
-        section.classList.remove("loading"); 
-        cards.classList.remove("loading"); 
+    } finally {
+        section.classList.remove("loading");
+        cards.classList.remove("loading");
     }
 
 }
