@@ -2,10 +2,15 @@ import { render } from "./main.js";
 import { getRecentSearched } from "./recentSearch.js";
 
 
-export async function getApi(apiKey , city, lastSearched) {
-console.log(city)
+export async function getApi(apiKey, city, lastSearched) {
+    console.log(city)
     let err = document.querySelector(".error")
+    let section = document.querySelector("section");
+    let cards = document.querySelector("#UpcomingDays");
+    section.classList.add("loading");
+    cards.classList.add("loading");
 
+    err.textContent = "";
     const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=3`;
     try {
         let response = await fetch(url);
@@ -23,6 +28,9 @@ console.log(city)
         err.textContent = error.message;
 
 
+    }finally {
+        section.classList.remove("loading"); 
+        cards.classList.remove("loading"); 
     }
 
 }

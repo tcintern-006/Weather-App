@@ -226,3 +226,24 @@ footer {
 h2 {
     font-family: var(--primary-font);
 }
+
+
+.loading {
+    opacity: 0.4;
+    filter: blur(1px);
+    pointer-events: none;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--text-muted);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
