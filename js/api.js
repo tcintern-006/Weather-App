@@ -8,8 +8,10 @@ export async function getApi(apiKey, city) {
     let err = document.querySelector(".error")
     let section = document.querySelector("section");
     let cards = document.querySelector("#UpcomingDays");
+    let Last5Searches = document.querySelector("#Last5Searches");
     section.classList.add("loading");
     cards.classList.add("loading");
+    Last5Searches.classList.add("loading");
 
     err.textContent = "";
     const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=3`;
@@ -20,6 +22,7 @@ export async function getApi(apiKey, city) {
         }
         let data = await response.json();
         lastSearched = [...lastSearched, data.location.name];
+        
         localStorage.setItem("lastSearched", JSON.stringify(lastSearched))
         getLastFive();
         getRecentSearched(lastSearched);
@@ -28,10 +31,10 @@ export async function getApi(apiKey, city) {
         console.log(error.message)
         err.textContent = error.message;
 
-
     } finally {
         section.classList.remove("loading");
         cards.classList.remove("loading");
+         Last5Searches.classList.remove("loading");
     }
 
 }

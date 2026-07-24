@@ -7,11 +7,6 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css">
     <title>Weather App</title>
-    <style>
-       
-
-
-    </style>
 </head>
 
 <body>
@@ -22,6 +17,9 @@
             <i id="toogle-btn" class="fa-regular fa-moon fa-lg"></i>
             <header>
                 <input type="search" placeholder="Search City" id="searchBar">
+                <ul id="suggestionList"></ul>
+                <p id="loadingText"></p>
+                <p id="errorText"></p>
                 <p class="error"></p>
             </header>
 
@@ -48,7 +46,7 @@
                     <h2>22 C</h2>
                 </div>
             </section>
-             <section id="Last5Searches">
+            <section id="Last5Searches">
                 <div class="lastSearchCards">
                     <h3>Mon</h3>
                     <img src="" alt="weather image">
@@ -56,9 +54,9 @@
                 </div>
             </section>
             <footer>
-                
-                    <span class="footer-label">Recent</span>
-                    
+
+                <span class="footer-label">Recent</span>
+
                 <div id="lastSearchedList">
                     <h1 id="lastSearched">lahore</h1>
                 </div>
@@ -67,7 +65,7 @@
         </div>
     </div>
 
-<script type="module" src="./js/main.js"></script>
+    <script type="module" src="./js/main.js"></script>
 </body>
 
 </html>
