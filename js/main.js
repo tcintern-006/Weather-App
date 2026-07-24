@@ -107,6 +107,10 @@ searchBar.addEventListener("input", (e) => {
         timer = setTimeout(() => {
             showSuggestion(re ,apiKey);
         }, 1000);
+    } eles{
+
+    suggestionList.innerHTML = "";
+
     }
 
 })
