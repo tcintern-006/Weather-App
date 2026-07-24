@@ -11,9 +11,8 @@ let getitems = JSON.parse(localStorage.getItem("lastSearched")) ?? [];
 let lastSearched = Array.isArray(getitems) ? getitems : [];
 
 
-// Fetch Last searched city weather
-let city = getitems[getitems.length - 1] ?? "Naushera"
-getApi(apiKey, city, lastSearched)
+
+
 
 
 
@@ -30,8 +29,8 @@ input.addEventListener('keydown', async (e) => {
 
 
 
-
-// GET LAST SEARCHED
+// Fetch Last searched city weather
+let city = getitems[getitems.length - 1] ?? "Naushera"
 async function get() {
     lastSearched = await getApi(apiKey, city, lastSearched);
 }
