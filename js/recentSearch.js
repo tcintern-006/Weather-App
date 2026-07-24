@@ -9,7 +9,7 @@ export const getRecentSearched = (lastSearched) => {
   h2.innerHTML = unique.map((e)=>{
     return `
       <div class="lastSearchedList">
-        <h1 class="lastSearchedItem"> ${e}</h1>
+        <h1 class="lastSearchedItem">${e}</h1>
       </div>
     `;
   }).join("");
