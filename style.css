@@ -359,7 +359,7 @@ footer {
 
 }
 
-#lastSearchedList h1 :hover {
+#lastSearchedList h1:hover {
     background-color: var(--tinary-bg);
     color: white;
 }
