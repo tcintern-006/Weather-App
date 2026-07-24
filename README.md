@@ -1,24 +1,33 @@
 # Weather App
 
-A responsive weather application built with vanilla JavaScript that fetches real-time weather data and a 3-day forecast from a public API. Built as part of an internship task focused on asynchronous JavaScript, API integration, and modular code architecture.
+A responsive weather dashboard built with vanilla JavaScript that fetches real-time weather data, a 3-day forecast, and city autocomplete suggestions from a public API. Built as part of an internship track covering asynchronous JavaScript, API integration, state persistence, and modular front-end architecture.
 
-## Live Features
+## Live Demo
+
+`https://tcintern-006.github.io/Weather-App/`
+
+## Features
 
 - Search current weather by city name
-- Display current temperature, condition, humidity, and wind speed
+- Live search-as-you-type city suggestions (debounced)
+- Current temperature, condition, humidity, and wind speed
 - 3-day forecast with daily weather icons
 - Graceful handling of invalid city names
-- Recently searched city tracking (persisted via `localStorage`)
+- Loading state while data is being fetched
+- Last 5 searched cities, persisted via `localStorage`
+- Click any recent search to reload its weather instantly
+- "Clear History" to wipe saved searches
 - Dark / light mode toggle
+- Automatically loads the last searched city's weather on page open
 
 ## Tech Stack
 
 - **HTML5** — semantic page structure
-- **CSS3** — responsive layout and theming
-- **JavaScript (ES6+)** — application logic, using native ES Modules
-- **[WeatherAPI.com](https://www.weatherapi.com/)** — weather data provider
+- **CSS3** — responsive layout, custom properties for theming, custom scrollbar styling
+- **JavaScript (ES6+)** — native ES Modules, no build tools or frameworks
+- **[WeatherAPI.com](https://www.weatherapi.com/)** — current weather, forecast, and search/autocomplete endpoints
 
-No frameworks or build tools are used. This project intentionally sticks to vanilla JS to reinforce core browser APIs and language fundamentals.
+This project intentionally avoids frameworks and bundlers to reinforce core browser APIs and language fundamentals.
 
 ## Project Structure
 
@@ -27,35 +36,39 @@ Weather-App/
 ├── index.html
 ├── style.css
 ├── js/
-│   ├── main.js          # entry point: DOM references, event listeners, render orchestration
-│   ├── api.js           # fetch logic, error handling, API communication
-│   ├── render.js         # forecast card rendering (pure rendering function)
-│   ├── recentSearch.js    # last-searched city tracking + shared date utility
-│   └── toogle.js         # dark/light mode toggle logic
+│   ├── main.js           # entry point — DOM references, event listeners, orchestration
+│   ├── api.js            # current weather + forecast fetch logic, loading/error handling
+│   ├── Suggestion.js      # debounced autocomplete search (search.json endpoint)
+│   ├── render.js          # pure rendering functions (current weather, forecast, recents)
+│   ├── recentSearch.js     # recent-search persistence, date formatting, last-5 lookup
+│   ├── deletehistory.js   # clear history logic
+│   └── toogle.js          # dark/light mode toggle
 └── README.md
 ```
 
 ### Why it's split this way
 
-Each file has a single, focused responsibility — a pattern known as **separation of concerns**:
+Each module has a single, focused responsibility — a pattern known as **separation of concerns**:
 
 | File | Responsibility |
 |---|---|
-| `main.js` | Wires up the DOM, owns application state (`city`, `lastSearched`), delegates work to the other modules |
-| `api.js` | Talks to the network. Knows nothing about the DOM. |
-| `render.js` | Turns forecast data into HTML. A pure function — same input always produces the same output. |
-| `recentSearch.js` | Small shared utilities (date formatting) and recent-search display logic |
-| `toogle.js` | Isolated UI behavior for theme switching |
+| `main.js` | Wires up the DOM, owns top-level state (`city`, `lastSearched`), delegates to other modules |
+| `api.js` | Talks to the network for current weather + forecast. Owns loading/error UI state. |
+| `Suggestion.js` | Talks to the network for city search suggestions, debounced on user input |
+| `render.js` | Turns weather/forecast/recent-search data into DOM updates or HTML strings |
+| `recentSearch.js` | Formats dates, tracks and re-renders the recent-searches list |
+| `deletehistory.js` | Clears `localStorage` and refreshes dependent UI |
+| `toogle.js` | Isolated dark/light theme toggle behavior |
 
-Splitting logic this way makes each piece independently readable, testable, and easier to debug — a change to how dates are formatted, for example, only requires touching one file.
+Splitting logic this way keeps each piece independently readable and debuggable — a change to how recent searches are displayed only requires touching one file, not hunting through a single monolithic script.
 
 ## Core Concepts Applied
 
 ### Fetch API + Async/Await
-All network requests use the native `fetch()` API wrapped in `async` functions, allowing asynchronous network calls to be written in a readable, top-to-bottom style rather than nested callbacks.
+All network requests use the native `fetch()` API wrapped in `async` functions:
 
 ```js
-async function getApi(apiKey, city, lastSearched) {
+export async function getApi(apiKey, city) {
   const response = await fetch(url);
   const data = await response.json();
   ...
@@ -63,7 +76,7 @@ async function getApi(apiKey, city, lastSearched) {
 ```
 
 ### Error Handling
-`fetch()` only rejects on network-level failures — it does **not** reject on HTTP error responses like a 404 for an invalid city. This is handled explicitly:
+`fetch()` only rejects on network-level failures — it does **not** reject on HTTP error responses like an invalid city name. This is handled explicitly:
 
 ```js
 if (!response.ok) {
@@ -71,32 +84,44 @@ if (!response.ok) {
 }
 ```
 
-All request logic is wrapped in `try...catch` to surface errors to the user through the UI rather than failing silently.
+All request logic is wrapped in `try...catch...finally`, so errors surface in the UI and loading state always clears — whether the request succeeds or fails.
 
-### ES Modules
-The project uses native browser `import` / `export` syntax rather than a bundler. Each file explicitly declares what it exposes (`export`) and what it depends on (`import`), making dependencies between files explicit and traceable.
+### Debouncing (Search-as-you-type)
+Typing in the search bar doesn't fire a request per keystroke. Instead, each keystroke cancels the previous pending timer and starts a new one — a request only fires once the user pauses typing:
 
 ```js
-// js/api.js
-export async function getApi(...) { ... }
+searchBar.addEventListener("input", (e) => {
+  clearTimeout(timer);
+  if (e.target.value.length > 2) {
+    timer = setTimeout(() => showSuggestion(e.target.value, apiKey), 1000);
+  }
+});
+```
 
-// js/main.js
+### Event Delegation
+Recent-search items and suggestion items are rendered dynamically via `innerHTML`, which replaces DOM nodes on every update. Rather than re-attaching listeners to elements that keep getting recreated, click listeners are attached once to a stable parent container and inspect `e.target` to determine what was actually clicked.
+
+### ES Modules
+The project uses native browser `import` / `export` syntax rather than a bundler:
+
+```js
+export async function getApi(...) { ... }
 import { getApi } from "./api.js";
 ```
 
-### State Passed Explicitly
-Rather than relying on shared global variables across modules, state (such as `lastSearched`) is passed into functions as parameters and returned back to the caller, keeping data flow explicit and predictable:
-
-```js
-lastSearched = await getApi(apiKey, city, lastSearched) ?? lastSearched;
-```
+Each file explicitly declares what it exposes and what it depends on, making dependencies between files traceable.
 
 ### Persisted State with `localStorage`
-The list of recently searched cities is saved as JSON and rehydrated on page load, so search history survives a page refresh:
+Recent searches are saved as JSON and rehydrated on page load, so search history and the last-viewed city survive a page refresh:
 
 ```js
 localStorage.setItem("lastSearched", JSON.stringify(lastSearched));
 JSON.parse(localStorage.getItem("lastSearched")) ?? [];
+```
+
+Duplicate city names are removed using `Set` before display:
+```js
+const unique = [...new Set(lastSearched)];
 ```
 
 ## Getting Started
@@ -109,33 +134,30 @@ JSON.parse(localStorage.getItem("lastSearched")) ?? [];
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/your-username/weather-app.git
-   cd weather-app
+   git clone https://github.com/tcintern-006/Weather-App.git
+   cd Weather-App
    ```
 
-2. Add your API key in `js/api.js`
+2. Add your API key in `js/api.js` (and `js/recentSearch.js`, `js/main.js`, `js/Suggestion.js` where referenced)
    ```js
    const apiKey = "YOUR_API_KEY_HERE";
    ```
 
-   Make sure `index.html` loads the entry point from the `js/` folder:
-   ```html
-   <script type="module" src="js/main.js"></script>
-   ```
-
-3. Serve the project locally (e.g. VS Code "Live Server" extension, or):
+3. Serve the project locally:
    ```bash
    npx serve .
    ```
+   Or use the VS Code "Live Server" extension.
 
 4. Open the served URL in your browser.
 
 ## Known Limitations / Future Improvements
 
-- API key is currently stored client-side in plain text — acceptable for a learning project, but not production-safe. A production version would proxy requests through a backend to keep the key private.
+- API key is currently duplicated across multiple files and stored client-side in plain text — acceptable for a learning project, but a production version would centralize it and proxy requests through a backend to keep it private.
+- Recent-search weather cards re-fetch all 5 cities from the network on every search, which is inefficient and could hit free-tier rate limits with heavy use. A future improvement would cache each city's data and only refetch when stale.
 - Forecast length is limited by the free API tier (currently 3 days).
 - No automated tests yet.
 
 ## Author
 
-Built as part of an internship async JavaScript & APIs challenge.
+Built as part of a multi-day internship track on asynchronous JavaScript, API integration, and Local Storage-based state persistence.
