@@ -96,6 +96,8 @@ let loadingText = document.querySelector("#loadingText");
 let errorText = document.querySelector("#errorText");
 let searchBar = document.querySelector("#searchBar")
 let timer;
+
+
 searchBar.addEventListener("input", (e) => {
 
     clearTimeout(timer)
@@ -116,7 +118,6 @@ suggestionList.addEventListener("click",(e)=>{
    const val =  e.target.innerHTML
    
    getApi(apiKey , val , lastSearched)
-   searchBar.textContent = val;
    loadingText.textContent = "";
    errorText.textContent ="";
     suggestionList.innerHTML = "";
